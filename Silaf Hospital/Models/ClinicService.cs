@@ -7,53 +7,41 @@ using System.Collections.Generic;
 
 namespace Silaf_Hospital.Services
 {
-    public class ClinicService : IClinicService
+    public class ClinicService
     {
         private List<Clinic> clinics = new List<Clinic>();
-        private ClinicFileHandler fileHandler = new ClinicFileHandler();
+        private readonly ClinicFileHandler fileHandler = new ClinicFileHandler();
 
         public ClinicService()
         {
-            LoadFromFile();
+            LoadClinics();
         }
 
         public void AddClinic(ClinicInputDTO input)
         {
-            Clinic clinic = new Clinic();
-            clinic.Name = input.Name;
-            clinic.BranchId = input.BranchId;
-            clinic.DepartmentId = input.DepartmentId;
-            clinic.OpeningHours = input.OpeningHours;
+            Clinic newClinic = new Clinic();
+            newClinic.Id = Guid.NewGuid().ToString();
+            newClinic.Name = input.Name;
+            newClinic.BranchId = input.BranchId;
+            newClinic.DepartmentId = input.DepartmentId;
 
-            clinics.Add(clinic);
-            SaveToFile();
+            clinics.Add(newClinic);
+            SaveClinics();
+            Console.WriteLine("Clinic added successfully.");
         }
 
-        public IEnumerable<Clinic> GetAllClinic()
+        public List<Clinic> GetAllClinic()
         {
             return clinics;
         }
 
-        public IEnumerable<Clinic> GetClinicByBranchDep(int branchId, int departmentId)
+        public Clinic GetClinicById(string clinicId)
         {
-            List<Clinic> result = new List<Clinic>();
-            foreach (Clinic clinic in clinics)
+            for (int i = 0; i < clinics.Count; i++)
             {
-                if (clinic.BranchId == branchId.ToString() && clinic.DepartmentId == departmentId.ToString())
+                if (clinics[i].Id == clinicId)
                 {
-                    result.Add(clinic);
-                }
-            }
-            return result;
-        }
-
-        public Clinic GetClinicById(int clinicId)
-        {
-            foreach (Clinic clinic in clinics)
-            {
-                if (clinic.Id == clinicId.ToString())
-                {
-                    return clinic;
+                    return clinics[i];
                 }
             }
             return null;
@@ -61,121 +49,118 @@ namespace Silaf_Hospital.Services
 
         public Clinic GetClinicByName(string clinicName)
         {
-            foreach (Clinic clinic in clinics)
+            for (int i = 0; i < clinics.Count; i++)
             {
-                if (clinic.Name != null && clinic.Name.Equals(clinicName, StringComparison.OrdinalIgnoreCase))
+                if (clinics[i].Name == clinicName)
                 {
-                    return clinic;
+                    return clinics[i];
                 }
             }
             return null;
         }
 
-        public string GetClinicName(int clinicId)
-        {
-            Clinic clinic = GetClinicById(clinicId);
-            if (clinic != null)
-            {
-                return clinic.Name;
-            }
-            return "Unknown";
-        }
-
-        public IEnumerable<Clinic> GetClinicsByBranchName(string branchName)
-        {
-            List<Clinic> result = new List<Clinic>();
-            foreach (Clinic clinic in clinics)
-            {
-                if (clinic.BranchId != null && clinic.BranchId.Equals(branchName, StringComparison.OrdinalIgnoreCase))
-                {
-                    result.Add(clinic);
-                }
-            }
-            return result;
-        }
-
-        public IEnumerable<Clinic> GetClinicsByDepartmentId(int departmentId)
-        {
-            List<Clinic> result = new List<Clinic>();
-            foreach (Clinic clinic in clinics)
-            {
-                if (clinic.DepartmentId == departmentId.ToString())
-                {
-                    result.Add(clinic);
-                }
-            }
-            return result;
-        }
-
-        public decimal GetPrice(int clinicId)
-        {
-            return 20.0m; // Static pricing logic
-        }
-
-        public void SetClinicStatus(int clinicId)
-        {
-            Clinic clinic = GetClinicById(clinicId);
-            if (clinic != null)
-            {
-                clinic.DisplayInfo();
-                Console.WriteLine("Clinic status toggled (demo message).");
-            }
-        }
-
-        public void UpdateClinicDetails(int clinicId, ClinicInputDTO input)
-        {
-            Clinic clinic = GetClinicById(clinicId);
-            if (clinic != null)
-            {
-                clinic.Name = input.Name;
-                clinic.BranchId = input.BranchId;
-                clinic.DepartmentId = input.DepartmentId;
-                clinic.OpeningHours = input.OpeningHours;
-                SaveToFile();
-            }
-        }
-
-        public ClinicOutputDTO GetClinicData(string name, string id)
-        {
-            foreach (Clinic clinic in clinics)
-            {
-                if ((!string.IsNullOrWhiteSpace(name) && clinic.Name != null && clinic.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ||
-                    (!string.IsNullOrWhiteSpace(id) && clinic.Id == id))
-                {
-                    ClinicOutputDTO dto = new ClinicOutputDTO();
-                    dto.Id = clinic.Id;
-                    dto.Name = clinic.Name;
-                    dto.BranchId = clinic.BranchId;
-                    dto.DepartmentId = clinic.DepartmentId;
-                    dto.OpeningHours = clinic.OpeningHours;
-                    return dto;
-                }
-            }
-            return null;
-        }
-
-        public void SaveToFile()
-        {
-            fileHandler.Save(clinics);
-        }
-
-        public void LoadFromFile()
-        {
-            clinics = fileHandler.Load();
-        }
-
-        public bool DeleteClinic(string id)
+        public string GetClinicName(string clinicId)
         {
             for (int i = 0; i < clinics.Count; i++)
             {
-                if (clinics[i].Id == id)
+                if (clinics[i].Id == clinicId)
                 {
-                    clinics.RemoveAt(i);
-                    SaveToFile();
-                    return true;
+                    return clinics[i].Name;
                 }
             }
-            return false;
+            return null;
+        }
+
+        public List<Clinic> GetClinicsByBranchName(string branchName)
+        {
+            List<Clinic> result = new List<Clinic>();
+            for (int i = 0; i < clinics.Count; i++)
+            {
+                if (clinics[i].BranchId == branchName)
+                {
+                    result.Add(clinics[i]);
+                }
+            }
+            return result;
+        }
+
+        public List<Clinic> GetClinicsByDepartmentId(int departmentId)
+        {
+            List<Clinic> result = new List<Clinic>();
+            for (int i = 0; i < clinics.Count; i++)
+            {
+                if (clinics[i].DepartmentId == departmentId.ToString())
+                {
+                    result.Add(clinics[i]);
+                }
+            }
+            return result;
+        }
+
+        public List<Clinic> GetClinicByBranchDep(int branchId, int departmentId)
+        {
+            List<Clinic> result = new List<Clinic>();
+            for (int i = 0; i < clinics.Count; i++)
+            {
+                if (clinics[i].BranchId == branchId.ToString() && clinics[i].DepartmentId == departmentId.ToString())
+                {
+                    result.Add(clinics[i]);
+                }
+            }
+            return result;
+        }
+
+        public void UpdateClinicName(string clinicId, string newName)
+        {
+            for (int i = 0; i < clinics.Count; i++)
+            {
+                if (clinics[i].Id == clinicId)
+                {
+                    clinics[i].Name = newName;
+                    SaveClinics();
+                    Console.WriteLine("Clinic name updated.");
+                    return;
+                }
+            }
+            Console.WriteLine("Clinic not found.");
+        }
+
+        public void DeleteClinic(string clinicId)
+        {
+            Clinic target = null;
+            for (int i = 0; i < clinics.Count; i++)
+            {
+                if (clinics[i].Id == clinicId)
+                {
+                    target = clinics[i];
+                    break;
+                }
+            }
+
+            if (target != null)
+            {
+                clinics.Remove(target);
+                SaveClinics();
+                Console.WriteLine("Clinic deleted.");
+            }
+            else
+            {
+                Console.WriteLine("Clinic not found.");
+            }
+        }
+
+        public void SaveClinics()
+        {
+            fileHandler.SaveClinics(clinics);
+        }
+
+        public void LoadClinics()
+        {
+            clinics = fileHandler.LoadClinics();
+            if (clinics == null)
+            {
+                clinics = new List<Clinic>();
+            }
         }
     }
 }

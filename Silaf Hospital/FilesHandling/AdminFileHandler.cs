@@ -2,25 +2,30 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Silaf_Hospital.FilesHandling
 {
     public class AdminFileHandler
     {
-        private readonly string filePath = "data/admins.txt";
+        private readonly string filePath = "admins.txt";
 
         public void SaveAdmins(List<Admin> admins)
         {
-            Directory.CreateDirectory("data");
             using (StreamWriter writer = new StreamWriter(filePath))
             {
                 foreach (Admin admin in admins)
                 {
-                    writer.WriteLine($"{admin.Id},{admin.FullName},{admin.NationalId},{admin.Email},{admin.PhoneNumber},{admin.Password},{admin.AssignedBranchId}");
+                    string line = admin.FullName + "," +
+                                  admin.Email + "," +
+                                  admin.Password + "," +
+                                  admin.PhoneNumber + "," +
+                                  admin.NationalId + "," +
+                                  admin.AssignedBranchId;
+
+                    writer.WriteLine(line);
                 }
             }
-
-            Console.WriteLine(" Admin data saved.");
         }
 
         public List<Admin> LoadAdmins()
@@ -28,31 +33,35 @@ namespace Silaf_Hospital.FilesHandling
             List<Admin> admins = new List<Admin>();
 
             if (!File.Exists(filePath))
+            {
                 return admins;
+            }
 
             string[] lines = File.ReadAllLines(filePath);
+
             foreach (string line in lines)
             {
                 string[] parts = line.Split(',');
 
-                if (parts.Length >= 7)
+                if (parts.Length >= 6)
                 {
-                    Admin admin = new Admin
+                    Admin admin = new Admin();
+                    admin.FullName = parts[0];
+                    admin.Email = parts[1];
+                    admin.Password = parts[2];
+                    admin.PhoneNumber = parts[3];
+                    admin.NationalId = parts[4];
+
+                    int branchId;
+                    if (int.TryParse(parts[5], out branchId))
                     {
-                        Id = parts[0],
-                        FullName = parts[1],
-                        NationalId = parts[2],
-                        Email = parts[3],
-                        PhoneNumber = parts[4],
-                        Password = parts[5],
-                        AssignedBranchId = parts[6]
-                    };
+                        admin.AssignedBranchId = branchId.ToString();
+                    }
 
                     admins.Add(admin);
                 }
             }
 
-            Console.WriteLine(" Admin data loaded.");
             return admins;
         }
     }

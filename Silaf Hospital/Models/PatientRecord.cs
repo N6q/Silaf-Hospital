@@ -7,6 +7,8 @@ namespace Silaf_Hospital.Models
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string PatientId { get; set; }
+        public string DoctorId { get; set; }
+        public string ClinicId { get; set; }
         public DateTime VisitDate { get; set; }
         public string DiagnosisSummary { get; set; }
 

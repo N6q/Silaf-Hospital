@@ -1,4 +1,5 @@
-﻿using Silaf_Hospital.DTOs;
+﻿
+using Silaf_Hospital.DTOs;
 using Silaf_Hospital.Models;
 using Silaf_Hospital.FilesHandling;
 using System;
@@ -6,113 +7,150 @@ using System.Collections.Generic;
 
 namespace Silaf_Hospital.Services
 {
-    public class PatientService : IPatientService
+    public class PatientService
     {
         private List<Patient> patients = new List<Patient>();
         private readonly PatientFileHandler fileHandler = new PatientFileHandler();
 
         public PatientService()
         {
-            patients = fileHandler.LoadPatients();
+            LoadPatients();
         }
 
         public void AddPatient(PatientInputDTO input)
         {
-            var patient = new Patient
-            {
-                Id = input.Id,
-                FullName = input.FullName,
-                NationalId = input.NationalId,
-                Email = input.Email,
-                PhoneNumber = input.PhoneNumber,
-                Password = input.Password,
-                Address = input.Address,
-                Age = input.Age,
-                Gender = input.Gender
-            };
+            Patient newPatient = new Patient();
+            newPatient.FullName = input.FullName;
+            newPatient.Email = input.Email;
+            newPatient.Password = input.Password;
+            newPatient.PhoneNumber = input.PhoneNumber;
+            newPatient.Gender = input.Gender;
+            newPatient.Age = input.Age;
+            newPatient.NationalId = input.NationalID;
+            newPatient.BranchId = input.BranchId;
 
-            patients.Add(patient);
-            fileHandler.SavePatients(patients);
+            int highestId = 0;
+            for (int i = 0; i < patients.Count; i++)
+            {
+                if (patients[i].UserID > highestId)
+                {
+                    highestId = patients[i].UserID;
+                }
+            }
+            newPatient.UserID = highestId + 1;
+
+            patients.Add(newPatient);
+            SavePatients();
+            Console.WriteLine("Patient added successfully.");
         }
 
-        public IEnumerable<Patient> GetAllPatients()
+        public void UpdatePatient(PatientInputDTO input)
         {
-            return patients;
+            for (int i = 0; i < patients.Count; i++)
+            {
+                if (patients[i].NationalId == input.NationalID)
+                {
+                    patients[i].FullName = input.FullName;
+                    patients[i].Email = input.Email;
+                    patients[i].Password = input.Password;
+                    patients[i].PhoneNumber = input.PhoneNumber;
+                    patients[i].Gender = input.Gender;
+                    patients[i].Age = input.Age;
+                    patients[i].BranchId = input.BranchId;
+
+                    SavePatients();
+                    Console.WriteLine("Patient updated.");
+                    return;
+                }
+            }
+            Console.WriteLine("Patient not found.");
         }
 
         public Patient GetPatientById(string id)
         {
-            foreach (Patient p in patients)
+            for (int i = 0; i < patients.Count; i++)
             {
-                if (p.Id == id) return p;
+                if (patients[i].UserID.ToString() == id)
+                {
+                    return patients[i];
+                }
+            }
+            return null;
+        }
+
+        public Patient GetPatientByNationalId(string nationalId)
+        {
+            for (int i = 0; i < patients.Count; i++)
+            {
+                if (patients[i].NationalId == nationalId)
+                {
+                    return patients[i];
+                }
             }
             return null;
         }
 
         public Patient GetPatientByName(string name)
         {
-            foreach (Patient p in patients)
+            for (int i = 0; i < patients.Count; i++)
             {
-                if (p.FullName != null && p.FullName.Equals(name, StringComparison.OrdinalIgnoreCase))
-                    return p;
+                if (patients[i].FullName == name)
+                {
+                    return patients[i];
+                }
             }
             return null;
         }
 
-        public void UpdatePatientDetails(string id, string phoneNumber)
+        public List<Patient> GetPatientsByBranch(string branchId)
         {
-            Patient patient = GetPatientById(id);
-            if (patient != null)
+            List<Patient> result = new List<Patient>();
+            for (int i = 0; i < patients.Count; i++)
             {
-                patient.PhoneNumber = phoneNumber;
-                fileHandler.SavePatients(patients);
+                if (patients[i].BranchId == branchId)
+                {
+                    result.Add(patients[i]);
+                }
+            }
+            return result;
+        }
+
+        public void DeletePatient(string nationalId)
+        {
+            Patient target = null;
+            for (int i = 0; i < patients.Count; i++)
+            {
+                if (patients[i].NationalId == nationalId)
+                {
+                    target = patients[i];
+                    break;
+                }
+            }
+
+            if (target != null)
+            {
+                patients.Remove(target);
+                SavePatients();
+                Console.WriteLine("Patient deleted.");
+            }
+            else
+            {
+                Console.WriteLine("Patient not found.");
             }
         }
 
-        public PatientOutputDTO GetPatientData(string userName, string id)
-        {
-            Patient found = null;
-
-            if (!string.IsNullOrWhiteSpace(userName))
-                found = GetPatientByName(userName);
-
-            if (!string.IsNullOrWhiteSpace(id) && found == null)
-                found = GetPatientById(id);
-
-            if (found == null) return null;
-
-            return new PatientOutputDTO
-            {
-                FullName = found.FullName,
-                Email = found.Email,
-                PhoneNumber = found.PhoneNumber,
-                Age = found.Age,
-                Gender = found.Gender,
-                Address = found.Address
-            };
-        }
-
-        public bool DeletePatient(string id)
-        {
-            Patient patient = GetPatientById(id);
-            if (patient != null)
-            {
-                patients.Remove(patient);
-                fileHandler.SavePatients(patients);
-                return true;
-            }
-            return false;
-        }
-
-        public void SaveToFile()
+        public void SavePatients()
         {
             fileHandler.SavePatients(patients);
         }
 
-        public void LoadFromFile()
+        public void LoadPatients()
         {
             patients = fileHandler.LoadPatients();
+            if (patients == null)
+            {
+                patients = new List<Patient>();
+            }
         }
     }
 }
-

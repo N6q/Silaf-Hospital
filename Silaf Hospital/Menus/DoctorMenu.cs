@@ -1,103 +1,115 @@
-﻿using System;
-using Silaf_Hospital.DTOs;
-using Silaf_Hospital.Models;
-using Silaf_Hospital.Services;
+﻿using Silaf_Hospital.Services;
+using System;
 
 namespace Silaf_Hospital.Menus
 {
     public static class DoctorMenu
     {
-        private static BookingService bookingService = new BookingService();
-        private static DiagnosisService diagnosisService = new DiagnosisService();
-        private static PatientService patientService = new PatientService();
-
-        public static void Show()
+        public static void Show(string doctorId, BookingService bookingService, PatientRecordService recordService)
         {
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("=======================");
-                Console.WriteLine("     DOCTOR PANEL      ");
-                Console.WriteLine("=======================");
-                Console.WriteLine("1. View Today's Appointments");
-                Console.WriteLine("2. Add Diagnosis");
-                Console.WriteLine("3. View Diagnoses by Patient");
-                Console.WriteLine("0. Back to Main Menu");
-                Console.Write("Enter your choice: ");
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("======= DOCTOR MENU =======");
+                Console.ResetColor();
 
-                string choice = Console.ReadLine();
-                Console.Clear();
+                Console.WriteLine("1. View Appointments");
+                Console.WriteLine("2. Manage Patient Records");
+                Console.WriteLine("0. Logout");
 
-                switch (choice)
+                Console.Write("\nChoose an option: ");
+                string input = Console.ReadLine();
+
+                switch (input)
                 {
                     case "1":
-                        ViewAppointments();
+                        ViewAppointments(bookingService, doctorId);
                         break;
                     case "2":
-                        AddDiagnosis();
-                        break;
-                    case "3":
-                        ViewDiagnoses();
+                        ManagePatientRecords(recordService, doctorId);
                         break;
                     case "0":
                         return;
                     default:
-                        Console.WriteLine("Invalid option. Press any key to continue...");
+                        Console.WriteLine("❌ Invalid option.");
                         Console.ReadKey();
                         break;
                 }
             }
         }
 
-        private static void ViewAppointments()
+        private static void ViewAppointments(BookingService service, string doctorId)
         {
-            Console.Write("Enter Clinic ID: ");
-            int clinicId = int.Parse(Console.ReadLine());
-            var today = DateTime.Today;
-            var appointments = bookingService.ScheduledAppointments(clinicId, today);
+            var bookings = service.GetBookingsByDoctorId(doctorId);
+            Console.WriteLine("\n📅 Appointments:");
 
-            foreach (var b in appointments)
+            foreach (var b in bookings)
             {
-                Console.WriteLine($"Booking ID: {b.Id} | Patient ID: {b.PatientId} | Time: {b.AppointmentDate}");
+                Console.WriteLine($"📅 {b.Slot.ToShortDateString()} {b.Slot.ToShortTimeString()} | Patient: {b.PatientId}");
             }
 
-            Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
         }
 
-        private static void AddDiagnosis()
+        private static void ManagePatientRecords(PatientRecordService service, string doctorId)
         {
-            DiagnosisInputDTO input = new DiagnosisInputDTO();
-            Console.Write("Patient ID: ");
-            string patientId = Console.ReadLine();
-            Console.Write("Diagnosis Name: ");
-            input.Name = Console.ReadLine();
-            Console.Write("Notes: ");
-            input.Notes = Console.ReadLine();
-            Console.Write("Severity: ");
-            input.Severity = Console.ReadLine();
-
-            string doctorId = "DOCTOR-123"; // For now hardcoded, later use logged-in doctor
-            diagnosisService.AddDiagnosis(input, patientId, doctorId);
-
-            Console.WriteLine("Diagnosis added. Press any key to continue...");
-            Console.ReadKey();
-        }
-
-        private static void ViewDiagnoses()
-        {
-            Console.Write("Enter Patient ID: ");
-            string patientId = Console.ReadLine();
-
-            var diagnoses = diagnosisService.GetDiagnosesByPatientId(patientId);
-
-            foreach (var d in diagnoses)
+            while (true)
             {
-                Console.WriteLine($"Diagnosis ID: {d.Id} | Name: {d.Name} | Date: {d.DateDiagnosed} | Notes: {d.Notes} | Severity: {d.Severity}");
-            }
+                Console.Clear();
+                Console.WriteLine("=== Manage Patient Records ===");
 
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+                var records = service.GetRecordsByDoctorId(doctorId);
+
+                Console.WriteLine("\n1. View All Records");
+                Console.WriteLine("2. Filter by Patient ID");
+                Console.WriteLine("3. Add Record");
+                Console.WriteLine("4. Back");
+                Console.Write("\n> ");
+                string option = Console.ReadLine();
+
+                switch (option)
+                {
+                    case "1":
+                        foreach (var r in records)
+                        {
+                            Console.WriteLine($"📄 {r.Id} | Patient: {r.PatientId} | Date: {r.Date.ToShortDateString()}");
+                        }
+                        Console.ReadKey();
+                        break;
+
+                    case "2":
+                        Console.Write("Enter Patient ID: ");
+                        string pid = Console.ReadLine();
+                        var filtered = service.GetRecordsByPatientId(pid);
+                        foreach (var r in filtered)
+                        {
+                            Console.WriteLine($"📄 {r.Id} | Date: {r.Date.ToShortDateString()} | Note: {r.Note}");
+                        }
+                        Console.ReadKey();
+                        break;
+
+                    case "3":
+                        Console.Write("Patient ID: ");
+                        string patientId = Console.ReadLine();
+
+                        Console.Write("Diagnosis: ");
+                        string note = Console.ReadLine();
+
+                        service.AddRecord(doctorId, patientId, note);
+                        Console.WriteLine("✅ Record added.");
+                        Console.ReadKey();
+                        break;
+
+                    case "4":
+                        return;
+
+                    default:
+                        Console.WriteLine("❌ Invalid.");
+                        Console.ReadKey();
+                        break;
+                }
+            }
         }
     }
 }

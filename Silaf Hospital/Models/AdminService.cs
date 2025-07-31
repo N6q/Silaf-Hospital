@@ -94,6 +94,24 @@ namespace Silaf_Hospital.Services
             Console.WriteLine(" Admin not found.");
             return false;
         }
+        public void ViewAllAdmins()
+        {
+            if (admins.Count == 0)
+            {
+                Console.WriteLine(" No admins found.");
+                return;
+            }
+
+            foreach (Admin admin in admins)
+            {
+                Console.WriteLine(" National ID: " + admin.NationalId);
+                Console.WriteLine(" Name: " + admin.FullName);
+                Console.WriteLine(" Email: " + admin.Email);
+                Console.WriteLine(" Phone: " + admin.PhoneNumber);
+                Console.WriteLine(" Branch ID: " + admin.AssignedBranchId);
+                Console.WriteLine("----------------------------------");
+            }
+        }
 
         public AdminOutputDTO GetAdminData(string name, string id)
         {

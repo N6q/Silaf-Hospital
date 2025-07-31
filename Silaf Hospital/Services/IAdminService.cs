@@ -13,6 +13,8 @@ namespace Silaf_Hospital.Services
         void UpdateAdmin(AdminUpdateDTO input);
         bool DeleteAdmin(string id);
         AdminOutputDTO GetAdminData(string name, string id);
+        void ViewAllAdmins();
+
         void SaveToFile();
         void LoadFromFile();
     }

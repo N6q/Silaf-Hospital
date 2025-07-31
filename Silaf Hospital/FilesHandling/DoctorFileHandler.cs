@@ -12,11 +12,22 @@ namespace Silaf_Hospital.FilesHandling
         public void SaveDoctors(List<Doctor> doctors)
         {
             Directory.CreateDirectory("data");
+
             using (StreamWriter writer = new StreamWriter(filePath))
             {
                 foreach (Doctor doctor in doctors)
                 {
-                    writer.WriteLine($"{doctor.Id},{doctor.FullName},{doctor.NationalId},{doctor.Email},{doctor.PhoneNumber},{doctor.Password},{doctor.Specialization},{doctor.DepartmentId},{doctor.ClinicId},{doctor.WorkingHours}");
+                    writer.WriteLine($"{doctor.Id}," +
+                                     $"{doctor.FullName}," +
+                                     $"{doctor.NationalId}," +
+                                     $"{doctor.Email}," +
+                                     $"{doctor.PhoneNumber}," +
+                                     $"{doctor.Password}," +
+                                     $"{doctor.Specialization}," +
+                                     $"{doctor.DepartmentId}," +
+                                     $"{doctor.ClinicId}," +
+                                     $"{doctor.WorkingHours}," +
+                                     $"{doctor.IsAvailable}");
                 }
             }
 
@@ -28,34 +39,34 @@ namespace Silaf_Hospital.FilesHandling
             List<Doctor> doctors = new List<Doctor>();
 
             if (!File.Exists(filePath))
+            {
                 return doctors;
+            }
 
             string[] lines = File.ReadAllLines(filePath);
             foreach (string line in lines)
             {
                 string[] parts = line.Split(',');
 
-                if (parts.Length >= 10)
+                if (parts.Length >= 11)
                 {
-                    Doctor doctor = new Doctor
-                    {
-                        Id = parts[0],
-                        FullName = parts[1],
-                        NationalId = parts[2],
-                        Email = parts[3],
-                        PhoneNumber = parts[4],
-                        Password = parts[5],
-                        Specialization = parts[6],
-                        DepartmentId = parts[7],
-                        ClinicId = parts[8],
-                        WorkingHours = parts[9]
-                    };
+                    Doctor doctor = new Doctor();
+                    doctor.Id = parts[0];
+                    doctor.FullName = parts[1];
+                    doctor.NationalId = parts[2];
+                    doctor.Email = parts[3];
+                    doctor.PhoneNumber = parts[4];
+                    doctor.Password = parts[5];
+                    doctor.Specialization = parts[6];
+                    doctor.DepartmentId = parts[7];
+                    doctor.ClinicId = parts[8];
+                    doctor.WorkingHours = parts[9];
+                    doctor.IsAvailable = bool.Parse(parts[10]);
 
                     doctors.Add(doctor);
                 }
             }
 
-            Console.WriteLine(" Doctor data loaded from file.");
             return doctors;
         }
     }

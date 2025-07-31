@@ -1,123 +1,158 @@
-﻿using System;
+﻿using Silaf_Hospital.Services;
 using Silaf_Hospital.DTOs;
-using Silaf_Hospital.Models;
-using Silaf_Hospital.Services;
+using System;
 
 namespace Silaf_Hospital.Menus
 {
     public static class PatientMenu
     {
-        private static BookingService bookingService = new BookingService();
-        private static DiagnosisService diagnosisService = new DiagnosisService();
-        private static FeedbackService feedbackService = new FeedbackService();
-
-        public static void Show()
+        public static void Show(string patientId, PatientService patientService, BookingService bookingService, PatientRecordService recordService)
         {
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("=======================");
-                Console.WriteLine("     PATIENT PANEL     ");
-                Console.WriteLine("=======================");
-                Console.WriteLine("1. Book Appointment");
-                Console.WriteLine("2. View My Appointments");
-                Console.WriteLine("3. View My Diagnoses");
-                Console.WriteLine("4. Submit Feedback");
-                Console.WriteLine("0. Back to Main Menu");
-                Console.Write("Enter your choice: ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("======= PATIENT MENU =======");
+                Console.ResetColor();
 
-                string choice = Console.ReadLine();
-                Console.Clear();
+                Console.WriteLine("1. View My Profile");
+                Console.WriteLine("2. Update My Info");
+                Console.WriteLine("3. Book Appointment");
+                Console.WriteLine("4. View My Bookings");
+                Console.WriteLine("5. View My Medical Records");
+                Console.WriteLine("0. Logout");
 
-                switch (choice)
+                Console.Write("\nChoose an option: ");
+                string input = Console.ReadLine();
+
+                switch (input)
                 {
                     case "1":
-                        BookAppointment();
+                        ViewProfile(patientService, patientId);
                         break;
                     case "2":
-                        ViewAppointments();
+                        UpdateProfile(patientService, patientId);
                         break;
                     case "3":
-                        ViewDiagnoses();
+                        BookAppointment(bookingService, patientId);
                         break;
                     case "4":
-                        SubmitFeedback();
+                        ViewMyBookings(bookingService, patientId);
+                        break;
+                    case "5":
+                        ViewMyRecords(recordService, patientId);
                         break;
                     case "0":
                         return;
                     default:
-                        Console.WriteLine("Invalid option. Press any key to continue...");
+                        Console.WriteLine("❌ Invalid option.");
                         Console.ReadKey();
                         break;
                 }
             }
         }
 
-        private static void BookAppointment()
+        private static void ViewProfile(PatientService service, string patientId)
         {
-            Console.Write("Enter Clinic ID: ");
-            int clinicId = int.Parse(Console.ReadLine());
-            Console.Write("Enter Appointment Date (yyyy-MM-dd): ");
-            DateTime date = DateTime.Parse(Console.ReadLine());
-
-            BookingInputDTO input = new BookingInputDTO
+            var patient = service.GetPatientById(patientId);
+            if (patient != null)
             {
-                ClinicId = clinicId.ToString(),
-                AppointmentDate = date
-            };
-
-            Console.Write("Enter your Patient ID: ");
-            int patientId = int.Parse(Console.ReadLine());
-
-            bookingService.BookAppointment(input, patientId);
-            Console.WriteLine("Appointment booked. Press any key to continue...");
-            Console.ReadKey();
-        }
-
-        private static void ViewAppointments()
-        {
-            Console.Write("Enter your Patient ID: ");
-            int patientId = int.Parse(Console.ReadLine());
-
-            var appointments = bookingService.GetBookedAppointments(patientId);
-            foreach (var b in appointments)
-            {
-                Console.WriteLine($"Booking ID: {b.Id} | Clinic ID: {b.ClinicId} | Date: {b.AppointmentDate} | Status: {(b.IsBooked ? "Booked" : "Canceled")}");
+                Console.WriteLine($"\n🧑 Name: {patient.FullName}");
+                Console.WriteLine($"📧 Email: {patient.Email}");
+                Console.WriteLine($"📞 Phone: {patient.PhoneNumber}");
+                Console.WriteLine($"🎂 Age: {patient.Age}");
+                Console.WriteLine($"🪪 National ID: {patient.NationalId}");
+                Console.WriteLine($"🏢 Branch: {patient.BranchId}");
             }
-            Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
         }
 
-        private static void ViewDiagnoses()
+        private static void UpdateProfile(PatientService service, string patientId)
         {
-            Console.Write("Enter your Patient ID: ");
-            string patientId = Console.ReadLine();
-
-            var diagnoses = diagnosisService.GetDiagnosesByPatientId(patientId);
-            foreach (var d in diagnoses)
+            var patient = service.GetPatientById(patientId);
+            if (patient == null)
             {
-                Console.WriteLine($"Diagnosis ID: {d.Id} | Name: {d.Name} | Date: {d.DateDiagnosed} | Severity: {d.Severity} | Notes: {d.Notes}");
+                Console.WriteLine("❌ Patient not found.");
+                Console.ReadKey();
+                return;
             }
-            Console.WriteLine("Press any key to continue...");
+
+            PatientInputDTO dto = new PatientInputDTO();
+            dto.NationalID = patient.NationalId;
+
+            Console.Write("New Full Name: ");
+            dto.FullName = Console.ReadLine();
+
+            Console.Write("New Email: ");
+            dto.Email = Console.ReadLine();
+
+            Console.Write("New Password: ");
+            dto.Password = Console.ReadLine();
+
+            Console.Write("New Phone Number: ");
+            dto.PhoneNumber = Console.ReadLine();
+
+            Console.Write("New Gender: ");
+            dto.Gender = Console.ReadLine();
+
+            Console.Write("New Age: ");
+            dto.Age = int.Parse(Console.ReadLine());
+
+            dto.BranchId = patient.BranchId;
+
+            service.UpdatePatient(dto);
+            Console.WriteLine("✅ Profile updated.");
             Console.ReadKey();
         }
 
-        private static void SubmitFeedback()
+        private static void BookAppointment(BookingService service, string patientId)
         {
-            FeedbackInputDTO input = new FeedbackInputDTO();
-            Console.Write("Enter your Patient ID: ");
-            string patientId = Console.ReadLine();
-            Console.Write("Doctor ID: ");
-            input.DoctorId = Console.ReadLine();
-            Console.Write("Appointment ID: ");
-            input.AppointmentId = Console.ReadLine();
-            Console.Write("Rating (1-5): ");
-            input.Rating = int.Parse(Console.ReadLine());
-            Console.Write("Comment: ");
-            input.Comment = Console.ReadLine();
+            BookingInputDTO dto = new BookingInputDTO();
 
-            feedbackService.SubmitFeedback(input, patientId);
-            Console.WriteLine("Feedback submitted. Press any key to continue...");
+            Console.Write("Enter Doctor ID: ");
+            dto.DoctorId = Console.ReadLine();
+
+            Console.Write("Enter Date (yyyy-MM-dd): ");
+            string dateStr = Console.ReadLine();
+            if (!DateTime.TryParse(dateStr, out DateTime date))
+            {
+                Console.WriteLine("❌ Invalid date.");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.Write("Enter Time (e.g. 06:30): ");
+            string time = Console.ReadLine();
+            dto.Slot = DateTime.Parse($"{date:yyyy-MM-dd} {time}");
+            dto.PatientId = patientId;
+
+            service.AddBooking(dto);
+            Console.ReadKey();
+        }
+
+        private static void ViewMyBookings(BookingService service, string patientId)
+        {
+            var bookings = service.GetBookingsByPatientId(patientId);
+            Console.WriteLine("\n📅 My Appointments:");
+
+            foreach (var b in bookings)
+            {
+                Console.WriteLine($"📆 {b.Slot.ToShortDateString()} | 🕒 {b.Slot.ToShortTimeString()} | 👨‍⚕️ Doctor: {b.DoctorId}");
+            }
+
+            Console.ReadKey();
+        }
+
+        private static void ViewMyRecords(PatientRecordService service, string patientId)
+        {
+            var records = service.GetRecordsByPatientId(patientId);
+
+            Console.WriteLine("\n📄 Medical Records:");
+            foreach (var record in records)
+            {
+                Console.WriteLine($"📝 {record.Date.ToShortDateString()} | Doctor: {record.DoctorId} | Note: {record.Note}");
+            }
+
             Console.ReadKey();
         }
     }

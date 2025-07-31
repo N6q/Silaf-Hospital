@@ -1,65 +1,69 @@
-﻿using System;
-using Silaf_Hospital.DTOs;
-using Silaf_Hospital.Services;
+﻿using Silaf_Hospital.Services;
+using System;
 
 namespace Silaf_Hospital.Menus
 {
     public static class AdminMenu
     {
-        private static readonly IDepartmentService departmentService = new DepartmentService();
-
-        public static void Show()
+        public static void Show(string branchId)
         {
+            DepartmentService departmentService = new DepartmentService();
+            DoctorService doctorService = new DoctorService();
+            ClinicService clinicService = new ClinicService();
+            PatientService patientService = new PatientService();
+            BookingService bookingService = new BookingService();
+
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("=== Admin Menu ===");
-                Console.WriteLine("1. Add Department");
-                Console.WriteLine("2. View Departments");
-                Console.WriteLine("0. Back to Main Menu");
-                Console.Write("Select option: ");
-                string choice = Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("========== ADMIN MENU ==========");
+                Console.ResetColor();
 
-                switch (choice)
+                Console.WriteLine("1. Manage Departments");
+                Console.WriteLine("2. Manage Doctors");
+                Console.WriteLine("3. Manage Clinics");
+                Console.WriteLine("4. Assign Doctor to Clinic");
+                Console.WriteLine("5. Manage Patients");
+                Console.WriteLine("6. Manage Bookings");
+                Console.WriteLine("7. View Branch Records");
+                Console.WriteLine("0. Logout");
+
+                Console.Write("\nSelect an option: ");
+                string input = Console.ReadLine();
+
+                switch (input)
                 {
                     case "1":
-                        AddDepartment();
+                        DepartmentBranchMenu.Show(branchId, departmentService);
                         break;
                     case "2":
-                        ViewDepartments();
+                        DoctorBranchMenu.Show(branchId, doctorService);
+                        break;
+                    case "3":
+                        ClinicBranchMenu.Show(branchId, clinicService);
+                        break;
+                    case "4":
+                        AssignDoctorToClinicMenu.Show(branchId, doctorService, clinicService);
+                        break;
+                    case "5":
+                        PatientBranchMenu.Show(branchId, patientService);
+                        break;
+                    case "6":
+                        BookingMenu.Show(branchId, bookingService);
+                        break;
+                    case "7":
+                        BranchReports.Show(branchId);
                         break;
                     case "0":
                         return;
+
                     default:
-                        Console.WriteLine("Invalid option. Press any key...");
+                        Console.WriteLine("❌ Invalid choice.");
                         Console.ReadKey();
                         break;
                 }
             }
-        }
-
-        private static void AddDepartment()
-        {
-            Console.Write("Enter Department Name: ");
-            string name = Console.ReadLine();
-
-            var input = new DepartmentInputDTO { Name = name };
-            departmentService.AddDepartment(input);
-
-            Console.WriteLine("Department added. Press any key...");
-            Console.ReadKey();
-        }
-
-        private static void ViewDepartments()
-        {
-            var departments = departmentService.GetAllDepartments();
-            Console.WriteLine("=== Department List ===");
-            foreach (var d in departments)
-            {
-                Console.WriteLine($"ID: {d.Id}, Name: {d.Name}");
-            }
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
         }
     }
 }

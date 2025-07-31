@@ -8,5 +8,7 @@
         public string? PhoneNumber { get; set; }
         public string? AdminId { get; set; }
         public bool? IsOpen { get; set; }
+        public string? AdminName { get; set; }           
+        public string? Location { get; set; }
     }
 }

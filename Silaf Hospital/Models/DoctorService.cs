@@ -1,4 +1,5 @@
-﻿using Silaf_Hospital.DTOs;
+﻿
+using Silaf_Hospital.DTOs;
 using Silaf_Hospital.Models;
 using Silaf_Hospital.FilesHandling;
 using System;
@@ -6,44 +7,116 @@ using System.Collections.Generic;
 
 namespace Silaf_Hospital.Services
 {
-    public class DoctorService : IDoctorService
+    public class DoctorService
     {
         private List<Doctor> doctors = new List<Doctor>();
         private readonly DoctorFileHandler fileHandler = new DoctorFileHandler();
 
         public DoctorService()
         {
-            doctors = fileHandler.LoadDoctors();
+            LoadDoctors();
         }
 
         public void AddDoctor(DoctorInputDTO input)
         {
-            var doctor = new Doctor
-            {
-                Id = Guid.NewGuid().ToString(),
-                FullName = input.FullName,
-                Email = input.Email,
-                Password = input.Password,
-                NationalId = input.NationalId,
-                PhoneNumber = input.PhoneNumber,
-                Specialization = input.Specialization,
-                DepartmentId = input.DepartmentId,
-                ClinicId = input.ClinicId,
-                WorkingHours = input.WorkingHours
-            };
+            Doctor newDoctor = new Doctor();
+            newDoctor.FullName = input.FullName;
+            newDoctor.Email = input.Email;
+            newDoctor.Password = input.Password;
+            newDoctor.PhoneNumber = input.PhoneNumber;
+            newDoctor.Gender = input.Gender;
+            newDoctor.Age = input.Age;
+            newDoctor.NationalId = input.NationalID;
+            newDoctor.DepartmentId = input.DepartmentId;
+            newDoctor.ClinicId = input.ClinicId;
+            newDoctor.BranchId = input.BranchId;
+            newDoctor.IsAvailable = input.IsAvailable;
 
-            doctors.Add(doctor);
-            fileHandler.SaveDoctors(doctors);
+            int highestId = 0;
+            for (int i = 0; i < doctors.Count; i++)
+            {
+                if (doctors[i].UserID > highestId)
+                {
+                    highestId = doctors[i].UserID;
+                }
+            }
+            newDoctor.UserID = highestId + 1;
+
+            doctors.Add(newDoctor);
+            SaveDoctors();
+            Console.WriteLine("Doctor added successfully.");
         }
 
-        public bool EmailExists(string email)
+        public void UpdateDoctor(Doctor doctor)
         {
-            foreach (Doctor d in doctors)
+            for (int i = 0; i < doctors.Count; i++)
             {
-                if (d.Email.Equals(email, StringComparison.OrdinalIgnoreCase))
-                    return true;
+                if (doctors[i].NationalId == doctor.NationalId)
+                {
+                    doctors[i] = doctor;
+                    SaveDoctors();
+                    Console.WriteLine("Doctor updated.");
+                    return;
+                }
             }
-            return false;
+            Console.WriteLine("Doctor not found.");
+        }
+
+        public void UpdateDoctorDetails(DoctorUpdateDTO input)
+        {
+            for (int i = 0; i < doctors.Count; i++)
+            {
+                if (doctors[i].NationalId == input.NationalId)
+                {
+                    doctors[i].FullName = input.FullName;
+                    doctors[i].Email = input.Email;
+                    doctors[i].Password = input.Password;
+                    doctors[i].PhoneNumber = input.PhoneNumber;
+                    doctors[i].Gender = input.Gender;
+                    doctors[i].Age = input.Age;
+                    doctors[i].IsAvailable = input.IsAvailable;
+                    SaveDoctors();
+                    Console.WriteLine("Doctor details updated.");
+                    return;
+                }
+            }
+            Console.WriteLine("Doctor not found.");
+        }
+
+        public Doctor GetDoctorById(string id)
+        {
+            for (int i = 0; i < doctors.Count; i++)
+            {
+                if (doctors[i].UserID.ToString() == id)
+                {
+                    return doctors[i];
+                }
+            }
+            return null;
+        }
+
+        public Doctor GetDoctorByName(string name)
+        {
+            for (int i = 0; i < doctors.Count; i++)
+            {
+                if (doctors[i].FullName == name)
+                {
+                    return doctors[i];
+                }
+            }
+            return null;
+        }
+
+        public Doctor GetDoctorByEmail(string email)
+        {
+            for (int i = 0; i < doctors.Count; i++)
+            {
+                if (doctors[i].Email == email)
+                {
+                    return doctors[i];
+                }
+            }
+            return null;
         }
 
         public List<Doctor> GetAllDoctors()
@@ -54,170 +127,118 @@ namespace Silaf_Hospital.Services
         public List<Doctor> GetDoctorByBrancDep(string branchId, string departmentId)
         {
             List<Doctor> result = new List<Doctor>();
-            foreach (Doctor d in doctors)
+            for (int i = 0; i < doctors.Count; i++)
             {
-                if (d.ClinicId == branchId && d.DepartmentId == departmentId)
-                    result.Add(d);
+                if (doctors[i].BranchId == branchId && doctors[i].DepartmentId == departmentId)
+                {
+                    result.Add(doctors[i]);
+                }
             }
             return result;
         }
 
-        public Doctor GetDoctorByEmail(string email)
-        {
-            foreach (Doctor d in doctors)
-            {
-                if (d.Email.Equals(email, StringComparison.OrdinalIgnoreCase))
-                    return d;
-            }
-            return null;
-        }
-
-        public Doctor GetDoctorById(string id)
-        {
-            foreach (Doctor d in doctors)
-            {
-                if (d.Id == id)
-                    return d;
-            }
-            return null;
-        }
-
-        public Doctor GetDoctorByName(string name)
-        {
-            foreach (Doctor d in doctors)
-            {
-                if (d.FullName.Equals(name, StringComparison.OrdinalIgnoreCase))
-                    return d;
-            }
-            return null;
-        }
-
-        public DoctorOutputDTO GetDoctorData(string name, string id)
-        {
-            Doctor d = null;
-
-            if (!string.IsNullOrWhiteSpace(name))
-                d = GetDoctorByName(name);
-
-            if (d == null && !string.IsNullOrWhiteSpace(id))
-                d = GetDoctorById(id);
-
-            if (d == null) return null;
-
-            return new DoctorOutputDTO
-            {
-                Id = d.Id,
-                FullName = d.FullName,
-                Specialization = d.Specialization,
-                DepartmentId = d.DepartmentId,
-                ClinicId = d.ClinicId,
-                WorkingHours = d.WorkingHours
-            };
-        }
-
         public List<DoctorOutputDTO> GetDoctorsByBranchName(string branchName)
         {
-            List<DoctorOutputDTO> results = new List<DoctorOutputDTO>();
-            foreach (Doctor d in doctors)
+            List<DoctorOutputDTO> result = new List<DoctorOutputDTO>();
+            for (int i = 0; i < doctors.Count; i++)
             {
-                if (d.ClinicId.Equals(branchName, StringComparison.OrdinalIgnoreCase))
+                if (doctors[i].BranchId == branchName)
                 {
-                    results.Add(new DoctorOutputDTO
-                    {
-                        Id = d.Id,
-                        FullName = d.FullName,
-                        Specialization = d.Specialization,
-                        DepartmentId = d.DepartmentId,
-                        ClinicId = d.ClinicId,
-                        WorkingHours = d.WorkingHours
-                    });
+                    DoctorOutputDTO dto = new DoctorOutputDTO();
+                    dto.FullName = doctors[i].FullName;
+                    dto.Email = doctors[i].Email;
+                    dto.PhoneNumber = doctors[i].PhoneNumber;
+                    dto.NationalId = doctors[i].NationalId;
+                    dto.BranchId = doctors[i].BranchId;
+                    result.Add(dto);
                 }
             }
-            return results;
+            return result;
         }
 
         public List<DoctorOutputDTO> GetDoctorsByDepartmentName(string departmentName)
         {
-            List<DoctorOutputDTO> results = new List<DoctorOutputDTO>();
-            foreach (Doctor d in doctors)
-            {
-                if (d.DepartmentId.Equals(departmentName, StringComparison.OrdinalIgnoreCase))
-                {
-                    results.Add(new DoctorOutputDTO
-                    {
-                        Id = d.Id,
-                        FullName = d.FullName,
-                        Specialization = d.Specialization,
-                        DepartmentId = d.DepartmentId,
-                        ClinicId = d.ClinicId,
-                        WorkingHours = d.WorkingHours
-                    });
-                }
-            }
-            return results;
-        }
-
-        public void UpdateDoctor(Doctor updated)
-        {
+            List<DoctorOutputDTO> result = new List<DoctorOutputDTO>();
             for (int i = 0; i < doctors.Count; i++)
             {
-                if (doctors[i].Id == updated.Id)
+                if (doctors[i].DepartmentId == departmentName)
                 {
-                    doctors[i] = updated;
-                    fileHandler.SaveDoctors(doctors);
-                    return;
+                    DoctorOutputDTO dto = new DoctorOutputDTO();
+                    dto.FullName = doctors[i].FullName;
+                    dto.Email = doctors[i].Email;
+                    dto.PhoneNumber = doctors[i].PhoneNumber;
+                    dto.NationalId = doctors[i].NationalId;
+                    dto.BranchId = doctors[i].BranchId;
+                    result.Add(dto);
                 }
             }
-        }
-
-        public void UpdateDoctorDetails(DoctorUpdateDTO input)
-        {
-            Doctor d = GetDoctorById(input.Id);
-            if (d != null)
-            {
-                d.DepartmentId = input.DepartmentId;
-                d.ClinicId = input.ClinicId;
-                d.WorkingHours = input.WorkingHours;
-                fileHandler.SaveDoctors(doctors);
-            }
+            return result;
         }
 
         public DoctorOutputDTO GetDoctorDetailsById(string id)
         {
-            Doctor d = GetDoctorById(id);
-            if (d == null) return null;
-
-            return new DoctorOutputDTO
+            Doctor doc = GetDoctorById(id);
+            if (doc != null)
             {
-                Id = d.Id,
-                FullName = d.FullName,
-                Specialization = d.Specialization,
-                DepartmentId = d.DepartmentId,
-                ClinicId = d.ClinicId,
-                WorkingHours = d.WorkingHours
-            };
+                DoctorOutputDTO dto = new DoctorOutputDTO();
+                dto.FullName = doc.FullName;
+                dto.Email = doc.Email;
+                dto.PhoneNumber = doc.PhoneNumber;
+                dto.NationalId = doc.NationalId;
+                dto.BranchId = doc.BranchId;
+                return dto;
+            }
+            return null;
         }
 
-        public void SaveToFile()
+        public bool EmailExists(string email)
         {
-            fileHandler.SaveDoctors(doctors);
-        }
-
-        public void LoadFromFile()
-        {
-            doctors = fileHandler.LoadDoctors();
+            for (int i = 0; i < doctors.Count; i++)
+            {
+                if (doctors[i].Email == email)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public bool DeleteDoctor(string id)
         {
-            Doctor d = GetDoctorById(id);
-            if (d != null)
+            Doctor target = null;
+            for (int i = 0; i < doctors.Count; i++)
             {
-                doctors.Remove(d);
-                fileHandler.SaveDoctors(doctors);
+                if (doctors[i].NationalId == id)
+                {
+                    target = doctors[i];
+                    break;
+                }
+            }
+
+            if (target != null)
+            {
+                doctors.Remove(target);
+                SaveDoctors();
+                Console.WriteLine("Doctor deleted.");
                 return true;
             }
+
+            Console.WriteLine("Doctor not found.");
             return false;
+        }
+
+        public void SaveDoctors()
+        {
+            fileHandler.SaveDoctors(doctors);
+        }
+
+        public void LoadDoctors()
+        {
+            doctors = fileHandler.LoadDoctors();
+            if (doctors == null)
+            {
+                doctors = new List<Doctor>();
+            }
         }
     }
 }
