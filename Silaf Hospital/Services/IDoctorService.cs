@@ -1,23 +1,26 @@
-﻿using HospitalSystemTeamTask.DTO_s;
-using HospitalSystemTeamTask.Models;
+﻿using Silaf_Hospital.DTOs;
+using Silaf_Hospital.Models;
+using System.Collections.Generic;
 
-namespace HospitalSystemTeamTask.Services
+namespace Silaf_Hospital.Services
 {
     public interface IDoctorService
     {
-        void AddDoctor(DoctorInput input);
+        void AddDoctor(DoctorInputDTO input);
         bool EmailExists(string email);
-        IEnumerable<Doctor> GetAllDoctors();
-        IEnumerable<Doctor> GetDoctorByBrancDep(int bid, int depid);
+        List<Doctor> GetAllDoctors();
+        List<Doctor> GetDoctorByBrancDep(string branchId, string departmentId);
         Doctor GetDoctorByEmail(string email);
-        Doctor GetDoctorById(int uid);
-        Doctor GetDoctorByName(string docName);
-        DoctorOutPutDTO GetDoctorData(string? docName, int? Did);
-        IEnumerable<DoctorOutPutDTO> GetDoctorsByBranchName(string branchName);
-        IEnumerable<DoctorOutPutDTO> GetDoctorsByDepartmentName(string departmentName);
+        Doctor GetDoctorById(string id);
+        Doctor GetDoctorByName(string name);
+        DoctorOutputDTO GetDoctorData(string docName, string docId);
+        List<DoctorOutputDTO> GetDoctorsByBranchName(string branchName);
+        List<DoctorOutputDTO> GetDoctorsByDepartmentName(string departmentName);
         void UpdateDoctor(Doctor doctor);
         void UpdateDoctorDetails(DoctorUpdateDTO input);
-        DoctorOutPutDTO GetDoctorDetailsById(int uid);
-
+        DoctorOutputDTO GetDoctorDetailsById(string id);
+        void SaveToFile();
+        void LoadFromFile();
+        bool DeleteDoctor(string id);
     }
 }

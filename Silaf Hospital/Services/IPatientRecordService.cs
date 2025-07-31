@@ -1,14 +1,14 @@
-﻿using HospitalSystemTeamTask.DTO_s;
-using HospitalSystemTeamTask.Models;
+﻿using Silaf_Hospital.DTOs;
+using Silaf_Hospital.Models;
 
-namespace HospitalSystemTeamTask.Services
+namespace Silaf_Hospital.Services
 {
     public interface IPatientRecordService
     {
-        IEnumerable<PatientRecordOutput> GetAllRecords();
+        IEnumerable<PatientRecordOutputDTO> GetAllRecords(); 
         void CreateRecord(PatientRecordInputDTO record, int doctorId);
         void UpdateRecord(int rid, string? treatment, string? inspection, int doctorId);
         void DeleteRecord(int rid);
-        public IEnumerable<PatientRecordOutput> GetRecords(int patientId);
+        public IEnumerable<PatientRecordOutputDTO> GetRecords(int patientId);
     }
 }

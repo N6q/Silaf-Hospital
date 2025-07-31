@@ -1,7 +1,7 @@
-﻿using HospitalSystemTeamTask.Models;
-using HospitalSystemTeamTask.Shared.Helper;
+﻿using Silaf_Hospital.Models;
 
-namespace HospitalSystemTeamTask.Services
+
+namespace Silaf_Hospital.Services
 {
     public interface IAuthService
     {

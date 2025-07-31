@@ -1,17 +1,20 @@
-﻿using HospitalSystemTeamTask.DTO_s;
-using HospitalSystemTeamTask.Models;
+﻿
+using Silaf_Hospital.DTOs;
+using Silaf_Hospital.Models;
+using System.Collections.Generic;
 
-namespace HospitalSystemTeamTask.Services
+namespace Silaf_Hospital.Services
 {
     public interface IBranchService
     {
-        void AddBranch(BranchDTO branchDto);
-        IEnumerable<Branch> GetAllBranches();
-        BranchDTO GetBranchById(int id);
-        BranchDTO GetBranchDetails(string? branchName, int? branchId);
-        Branch GetBranchDetailsByBranchName(string branchName);
-        string GetBranchName(int branchId);
-        void SetBranchStatus(int branchId, bool isActive);
-        void UpdateBranch(int branchId, BranchDTO branchDto);
+        void AddBranch(BranchInputDTO input);
+        void UpdateBranch(BranchUpdateDTO input);
+        bool DeleteBranch(string id);
+        List<Branch> GetAllBranches();
+        Branch GetBranchById(string id);
+        Branch GetBranchByName(string name);
+        BranchOutputDTO GetBranchData(string name, string id);
+        void SaveToFile();
+        void LoadFromFile();
     }
 }

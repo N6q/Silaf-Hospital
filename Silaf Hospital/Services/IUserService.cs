@@ -1,7 +1,7 @@
-﻿using HospitalSystemTeamTask.DTO_s;
-using HospitalSystemTeamTask.Models;
+﻿using Silaf_Hospital.DTOs;
+using Silaf_Hospital.Models;
 
-namespace HospitalSystemTeamTask.Services
+namespace Silaf_Hospital.Services
 {
     public interface IUserService
     {
