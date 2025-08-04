@@ -16,7 +16,7 @@ namespace Silaf_Hospital.FilesHandling
             {
                 foreach (var clinic in clinics)
                 {
-                    writer.WriteLine($"{clinic.Id},{clinic.Name},{clinic.BranchId},{clinic.DepartmentId},{clinic.OpeningHours}");
+                    writer.WriteLine($"{clinic.Id}|{clinic.Name}|{clinic.BranchId}|{clinic.DepartmentId}|{clinic.OpeningHours}");
                 }
             }
         }
@@ -29,7 +29,7 @@ namespace Silaf_Hospital.FilesHandling
             var lines = File.ReadAllLines(filePath);
             foreach (var line in lines)
             {
-                var parts = line.Split(',');
+                var parts = line.Split('|');
                 if (parts.Length >= 5)
                 {
                     clinics.Add(new Clinic

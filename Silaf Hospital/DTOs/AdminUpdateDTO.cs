@@ -7,4 +7,5 @@
     public string PhoneNumber { get; set; }
     public string AssignedBranchId { get; set; }
 
+
 }

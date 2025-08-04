@@ -26,7 +26,7 @@ namespace Silaf_Hospital.Services
             newDoctor.PhoneNumber = input.PhoneNumber;
             newDoctor.Gender = input.Gender;
             newDoctor.Age = input.Age;
-            newDoctor.NationalId = input.NationalID;
+            newDoctor.NationalId = input.NationalId;
             newDoctor.DepartmentId = input.DepartmentId;
             newDoctor.ClinicId = input.ClinicId;
             newDoctor.BranchId = input.BranchId;
@@ -35,9 +35,9 @@ namespace Silaf_Hospital.Services
             int highestId = 0;
             for (int i = 0; i < doctors.Count; i++)
             {
-                if (doctors[i].UserID > highestId)
+                if (doctors[i].Id > highestId)
                 {
-                    highestId = doctors[i].UserID;
+                    highestId = doctors[i].Id
                 }
             }
             newDoctor.UserID = highestId + 1;

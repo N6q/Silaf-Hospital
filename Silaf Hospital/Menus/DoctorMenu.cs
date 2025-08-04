@@ -73,7 +73,7 @@ namespace Silaf_Hospital.Menus
                     case "1":
                         foreach (var r in records)
                         {
-                            Console.WriteLine($"📄 {r.Id} | Patient: {r.PatientId} | Date: {r.Date.ToShortDateString()}");
+                            Console.WriteLine($"📄 {r.Id} | Patient: {r.PatientId} | Date: {r.VisitDate.ToShortDateString()}");
                         }
                         Console.ReadKey();
                         break;
@@ -84,7 +84,7 @@ namespace Silaf_Hospital.Menus
                         var filtered = service.GetRecordsByPatientId(pid);
                         foreach (var r in filtered)
                         {
-                            Console.WriteLine($"📄 {r.Id} | Date: {r.Date.ToShortDateString()} | Note: {r.Note}");
+                            Console.WriteLine($"📄 {r.Id} | Date: {r.VisitDate.ToShortDateString()} | Note: {r.DiagnosisSummary}");
                         }
                         Console.ReadKey();
                         break;
@@ -93,10 +93,14 @@ namespace Silaf_Hospital.Menus
                         Console.Write("Patient ID: ");
                         string patientId = Console.ReadLine();
 
+                        Console.Write("Clinic ID: ");
+                        string clinicId = Console.ReadLine();
+
                         Console.Write("Diagnosis: ");
                         string note = Console.ReadLine();
 
-                        service.AddRecord(doctorId, patientId, note);
+                        service.AddRecord(doctorId, patientId, clinicId, note);
+
                         Console.WriteLine("✅ Record added.");
                         Console.ReadKey();
                         break;

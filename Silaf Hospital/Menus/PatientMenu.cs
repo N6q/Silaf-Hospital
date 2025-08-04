@@ -78,7 +78,7 @@ namespace Silaf_Hospital.Menus
             }
 
             PatientInputDTO dto = new PatientInputDTO();
-            dto.NationalID = patient.NationalId;
+            dto.NationalId = patient.NationalId;
 
             Console.Write("New Full Name: ");
             dto.FullName = Console.ReadLine();
@@ -150,7 +150,7 @@ namespace Silaf_Hospital.Menus
             Console.WriteLine("\n📄 Medical Records:");
             foreach (var record in records)
             {
-                Console.WriteLine($"📝 {record.Date.ToShortDateString()} | Doctor: {record.DoctorId} | Note: {record.Note}");
+                Console.WriteLine($"📝 {record.VisitDate.ToShortDateString()} | Doctor: {record.DoctorId} | Note: {record.DiagnosisSummary}");
             }
 
             Console.ReadKey();

@@ -10,6 +10,7 @@ namespace Silaf_Hospital.Models
         public string ClinicId { get; set; }
         public string WorkingHours { get; set; }
 
+        public string BranchId { get; set; }
         public bool IsAvailable { get; set; } = true;
 
         public ICollection<Booking> Appointments { get; set; } = new List<Booking>();

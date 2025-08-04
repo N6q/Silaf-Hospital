@@ -109,6 +109,18 @@ namespace Silaf_Hospital.Services
                 Console.WriteLine("Department not found.");
             }
         }
+        public DepartmentOutputDTO GetDepartmentDetailsById(string id)
+        {
+            var department = GetDepartmentById(id);
+            if (department == null)
+                return null;
+
+            return new DepartmentOutputDTO
+            {
+                Id = department.Id,
+                Name = department.Name
+            };
+        }
 
         public void SaveDepartments()
         {

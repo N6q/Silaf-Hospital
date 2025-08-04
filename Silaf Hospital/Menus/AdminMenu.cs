@@ -53,8 +53,16 @@ namespace Silaf_Hospital.Menus
                         BookingMenu.Show(branchId, bookingService);
                         break;
                     case "7":
-                        BranchReports.Show(branchId);
+                        BranchReports.Show(
+                            branchId,
+                            patientService,
+                            doctorService,
+                            clinicService,
+                            bookingService
+                        );
                         break;
+
+
                     case "0":
                         return;
 

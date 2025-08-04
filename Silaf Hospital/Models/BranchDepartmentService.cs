@@ -1,4 +1,4 @@
-
+﻿
 using Silaf_Hospital.DTOs;
 using Silaf_Hospital.Models;
 using Silaf_Hospital.FilesHandling;
@@ -31,6 +31,48 @@ namespace Silaf_Hospital.Services
             links.Add(link);
             SaveToFile();
         }
+        public void AssignDepartmentToBranch()
+        {
+            Console.Write("Enter Branch Name: ");
+            string branchName = Console.ReadLine();
+            var branch = branchService.GetBranchByName(branchName);
+
+            if (branch == null)
+            {
+                Console.WriteLine("❌ Branch not found.");
+                return;
+            }
+
+            Console.Write("Enter Department Name: ");
+            string depName = Console.ReadLine();
+            var department = departmentService.GetDepartmentByName(depName);
+
+            if (department == null)
+            {
+                Console.WriteLine("❌ Department not found.");
+                return;
+            }
+
+            Console.Write("Optional Notes: ");
+            string notes = Console.ReadLine();
+
+            var link = GetBranchDep(department.Id, branch.Id);
+            if (link != null)
+            {
+                Console.WriteLine("⚠️ Department already assigned to this branch.");
+                return;
+            }
+
+            AddDepartmentToBranch(new DTOs.BranchDepDTO
+            {
+                BranchId = branch.Id,
+                DepartmentId = department.Id,
+                Notes = notes
+            });
+
+            Console.WriteLine("✅ Department assigned to branch successfully.");
+        }
+
 
         public IEnumerable<DepartmentOutputDTO> GetDepartmentsByBranch(string branchId)
         {

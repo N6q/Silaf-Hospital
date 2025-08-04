@@ -151,12 +151,12 @@ namespace Silaf_Hospital.Services
 
         public void SaveClinics()
         {
-            fileHandler.SaveClinics(clinics);
+            fileHandler.Save(clinics);
         }
 
         public void LoadClinics()
         {
-            clinics = fileHandler.LoadClinics();
+            clinics = fileHandler.Load();
             if (clinics == null)
             {
                 clinics = new List<Clinic>();

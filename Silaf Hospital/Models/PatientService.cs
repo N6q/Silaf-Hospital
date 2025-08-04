@@ -26,18 +26,10 @@ namespace Silaf_Hospital.Services
             newPatient.PhoneNumber = input.PhoneNumber;
             newPatient.Gender = input.Gender;
             newPatient.Age = input.Age;
-            newPatient.NationalId = input.NationalID;
+            newPatient.NationalId = input.NationalId;
             newPatient.BranchId = input.BranchId;
 
-            int highestId = 0;
-            for (int i = 0; i < patients.Count; i++)
-            {
-                if (patients[i].UserID > highestId)
-                {
-                    highestId = patients[i].UserID;
-                }
-            }
-            newPatient.UserID = highestId + 1;
+           
 
             patients.Add(newPatient);
             SavePatients();
@@ -48,7 +40,7 @@ namespace Silaf_Hospital.Services
         {
             for (int i = 0; i < patients.Count; i++)
             {
-                if (patients[i].NationalId == input.NationalID)
+                if (patients[i].NationalId == input.NationalId)
                 {
                     patients[i].FullName = input.FullName;
                     patients[i].Email = input.Email;
@@ -66,17 +58,7 @@ namespace Silaf_Hospital.Services
             Console.WriteLine("Patient not found.");
         }
 
-        public Patient GetPatientById(string id)
-        {
-            for (int i = 0; i < patients.Count; i++)
-            {
-                if (patients[i].UserID.ToString() == id)
-                {
-                    return patients[i];
-                }
-            }
-            return null;
-        }
+
 
         public Patient GetPatientByNationalId(string nationalId)
         {

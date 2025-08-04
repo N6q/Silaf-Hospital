@@ -91,16 +91,16 @@ namespace Silaf_Hospital.Menus
             }
 
             admin.AssignedBranchId = branchId;
-            adminService.UpdateAdmin(adminId, new DTOs.UserInputDTO
+            adminService.UpdateAdmin(new AdminUpdateDTO
             {
                 FullName = admin.FullName,
                 Email = admin.Email,
                 Password = admin.Password,
                 PhoneNumber = admin.PhoneNumber,
-                Gender = admin.Gender,
-                Age = admin.Age,
-                NationalID = admin.NationalId
+                AssignedBranchId = branchId,
+                NationalId = admin.NationalId
             });
+
 
             Console.WriteLine("✅ Admin assigned to branch.");
             Console.ReadKey();

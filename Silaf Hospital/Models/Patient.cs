@@ -5,10 +5,9 @@ namespace Silaf_Hospital.Models
 {
     public class Patient : User
     {
-        public int Age { get; set; }
-        public string Gender { get; set; }
-        public string Address { get; set; }
 
+        public string Address { get; set; }
+        public string BranchId { get; set; }
         public List<string> MedicalConditions { get; set; } = new List<string>();
         public ICollection<Booking> Appointments { get; set; } = new List<Booking>();
         public ICollection<MedicalTest> MedicalTests { get; set; } = new List<MedicalTest>();

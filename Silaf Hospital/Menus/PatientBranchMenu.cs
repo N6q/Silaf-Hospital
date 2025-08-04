@@ -80,7 +80,7 @@ namespace Silaf_Hospital.Menus
             input.Age = int.Parse(Console.ReadLine());
 
             Console.Write("National ID: ");
-            input.NationalID = Console.ReadLine();
+            input.NationalId = Console.ReadLine();
 
             input.BranchId = branchId;
 
@@ -96,7 +96,7 @@ namespace Silaf_Hospital.Menus
 
             foreach (var p in patients)
             {
-                Console.WriteLine($"🧑 {p.FullName} | ID: {p.UserID} | 📞 {p.PhoneNumber}");
+                Console.WriteLine($"🧑 {p.FullName} | National ID: {p.NationalId} | 📞 {p.PhoneNumber}");
             }
 
             Console.ReadKey();
@@ -111,7 +111,7 @@ namespace Silaf_Hospital.Menus
             if (patient != null && patient.BranchId == branchId)
             {
                 PatientInputDTO input = new PatientInputDTO();
-                input.NationalID = nationalId;
+                input.NationalId = nationalId;
 
                 Console.Write("New Full Name: ");
                 input.FullName = Console.ReadLine();

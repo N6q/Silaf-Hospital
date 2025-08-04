@@ -24,6 +24,7 @@ namespace Silaf_Hospital.Models
         public BookingStatus Status { get; set; } = BookingStatus.Pending;
         public string Notes { get; set; }
         public bool IsBooked { get; set; }
+        public DateTime Slot { get; set; }
 
         public bool IsFirstVisit { get; set; } = false;
 
